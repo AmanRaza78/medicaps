@@ -1,8 +1,7 @@
-"use server"
+"use server";
 import { ID, Query } from "node-appwrite";
 import { users } from "../appwrite.config";
 import { z } from "zod";
-import { redirect } from "next/navigation";
 
 export type State = {
   status: "error" | "success" | undefined;
@@ -10,6 +9,7 @@ export type State = {
     [key: string]: string[];
   };
   message?: string | null;
+  redirectUrl?: string;
 };
 
 const userSchema = z.object({
@@ -23,7 +23,7 @@ const userSchema = z.object({
     .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
 });
 
-export async function createUser(prevState: any, formData: FormData){
+export async function createUser(prevState: any, formData: FormData) {
   const parsedUser = userSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -48,7 +48,13 @@ export async function createUser(prevState: any, formData: FormData){
       parsedUser.data.name
     );
 
-    return redirect(`/patients/${newUser.$id}/register`);
+    const state: State = {
+        status: "success",
+        message: "User created successfully",
+        redirectUrl: `/patients/${newUser.$id}/register`
+    };
+
+    return state
   } catch (error: any) {
     if (error && error?.code === 409) {
       const existingUser = await users.list([
@@ -62,4 +68,4 @@ export async function createUser(prevState: any, formData: FormData){
       return state;
     }
   }
-};
+}

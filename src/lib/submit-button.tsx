@@ -9,7 +9,7 @@ export default function SubmitButton({text}:{text:string}) {
       {pending ? (
         <Button disabled>Please Wait....</Button>
       ) : (
-        <Button type="submit">{text}</Button>
+        <Button type="submit" className="w-full">{text}</Button>
       )}
     </>
   );
